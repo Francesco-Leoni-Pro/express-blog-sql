@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 3000;
+const db = require('./db');
 
 // Middleware per leggere JSON nel body (utile per POST/PUT/PATCH)
 app.use(express.json());
