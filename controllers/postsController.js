@@ -77,11 +77,19 @@ function modify(req, res) {
 function destroy(req, res) {
   const id = parseInt(req.params.id);
 
-  posts.splice(id, 1);
+  db.query('DELETE FROM posts WHERE id = ?', [id], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Errore nella query' });
+    }
 
-  console.log(posts);
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ message: 'Post non trovato' });
+    }
 
-  res.sendStatus(204);
+    // 204 = No Content
+    res.sendStatus(204);
+  });
 }
 
 module.exports = {
