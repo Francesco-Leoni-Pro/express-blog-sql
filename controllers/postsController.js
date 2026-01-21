@@ -1,22 +1,33 @@
 const posts = require("../posts");
+const db = require('../db');
 
 // Index → restituisce la lista dei post in JSON
 function index(req, res) {
-  res.json(posts);
+  db.query('SELECT * FROM posts', (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Errore nella query' });
+    }
+    res.json(results);
+  });
 }
 
 // Show → restituisce un singolo post in JSON
 function show(req, res, next) {
   const id = parseInt(req.params.id);
-  const post = posts[id];
 
-  if (!post) {
-    const error = new Error("Post non trovato");
-    error.status = 404;
-    return next(error);
-  }
+  db.query('SELECT * FROM posts WHERE id = ?', [id], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Errore nella query' });
+    }
 
-  res.json(post);
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Post non trovato' });
+    }
+
+    res.json(results[0]);
+  });
 }
 
 // Create → stampa i dati ricevuti e risponde con messaggio
